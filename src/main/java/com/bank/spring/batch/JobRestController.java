@@ -15,26 +15,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class JobRestController {
-	
+
 	@Autowired
-	private JobLauncher jobLauncher; 
+	private JobLauncher jobLauncher;
 	@Autowired
 	private Job job;
-	
+	@Autowired
+	private BankTransactionItemAnalyticsProcessor bankTransactionItemAnalyticsProcessor; 
+
 	@GetMapping("/startJob")
-	public  BatchStatus load() throws Exception {
+	public BatchStatus load() throws Exception {
 		/* paramètres d'execution de job */
-		Map<String,JobParameter> params= new HashMap();
+		Map<String, JobParameter> params = new HashMap();
 		params.put("time", new JobParameter(System.currentTimeMillis()));
-		JobParameters jobParameters= new JobParameters(params);
-		JobExecution jobExecution=jobLauncher.run(job, jobParameters);
-		
-		while(jobExecution.isRunning()) {
+		JobParameters jobParameters = new JobParameters(params);
+		JobExecution jobExecution = jobLauncher.run(job, jobParameters);
+
+		while (jobExecution.isRunning()) {
 			System.out.println("job is running .............");
 		}
-		
+
 		return jobExecution.getStatus();
 	}
 
-	
+	@GetMapping("/analytics")
+	public Map<String, Double> analytics() {
+		Map<String, Double> map = new HashMap();
+		map.put("totalCredit",bankTransactionItemAnalyticsProcessor.getTotalCredit());
+		map.put("totalDebit", bankTransactionItemAnalyticsProcessor.getTotalDebit());
+		return map;
+	}
+
 }
