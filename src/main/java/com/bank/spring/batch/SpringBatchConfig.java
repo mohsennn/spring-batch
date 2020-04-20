@@ -37,6 +37,7 @@ public class SpringBatchConfig {
 	@Autowired
 	private ItemProcessor<BankTransaction, BankTransaction> bankTrasactionItemProcessor;
 
+	@Bean
 	public Job bankJob() {
 
 		Step step1 = stepBuilderFactory.get("step-load-data")
@@ -50,18 +51,18 @@ public class SpringBatchConfig {
 	}
 	
 	@Bean
-	public FlatFileItemReader<BankTransaction> fileItemReader(@Value("$inputFile")Resource inputFile){
+	public FlatFileItemReader<BankTransaction> fileItemReader(@Value("${inputFile}") Resource resource){
 		
-		FlatFileItemReader<BankTransaction> flatFileItemReader=new FlatFileItemReader<>();
+		FlatFileItemReader<BankTransaction> flatFileItemReader=new FlatFileItemReader<BankTransaction>();
 		flatFileItemReader.setName("FFIR1");
 		flatFileItemReader.setLinesToSkip(1);
-		flatFileItemReader.setResource(inputFile);
+		flatFileItemReader.setResource(resource);
 		flatFileItemReader.setLineMapper(lineMappe());
 		return  flatFileItemReader;
 	}
 
 	@Bean
-	private LineMapper<BankTransaction> lineMappe() {
+	public LineMapper<BankTransaction> lineMappe() {
 		DefaultLineMapper<BankTransaction> lineMapper= new DefaultLineMapper<>();
 		DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
 		delimitedLineTokenizer.setDelimiter(",");
